@@ -1,0 +1,41 @@
+{
+    "manifestVersion": 1,
+    "id": "meister-propr",
+    "version": "1.0.0",
+    "name": "Meister ProPR",
+    "description": "AI-powered code review for Azure DevOps pull requests, powered by Microsoft Foundry agents",
+    "publisher": "meister-propr-test-extension",
+    "targets": [
+        { "id": "Microsoft.VisualStudio.Services" }
+    ],
+    "public": false,
+    "categories": ["Azure Repos"],
+    "contributions": [
+        {
+            "id": "settings-hub",
+            "type": "ms.vss-web.hub",
+            "targets": ["ms.vss-web.project-admin-hub-group"],
+            "properties": {
+                "name": "Meister ProPR",
+                "uri": "settings.html",
+                "order": 99
+            }
+        },
+        {
+            "id": "review-hub",
+            "type": "ms.vss-web.hub",
+            "targets": ["ms.vss-code-web.code-hub-group"],
+            "properties": {
+                "name": "Meister ProPR",
+                "uri": "review.html",
+                "order": 99
+            }
+        }
+    ],
+    "files": [
+        { "path": "dist",          "addressable": true },
+        { "path": "settings.html", "addressable": true },
+        { "path": "review.html",   "addressable": true }
+    ],
+    "scopes": ["vso.code"]
+}

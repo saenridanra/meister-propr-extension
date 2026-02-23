@@ -1,0 +1,70 @@
+body {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    margin: 0;
+    padding: 16px;
+    color: #333;
+}
+
+#settings-root {
+    max-width: 520px;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #0078d4;
+    box-shadow: 0 0 0 1px #0078d4;
+}
+
+button {
+    padding: 7px 16px;
+    background: #0078d4;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    background: #106ebe;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#status-message {
+    margin-top: 10px;
+    font-size: 13px;
+    min-height: 18px;
+}
+
+.status-success { color: #107c10; }
+.status-error   { color: #a80000; }

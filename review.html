@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meister ProPR</title>
+</head>
+<body>
+    <div id="review-root">
+        <h2>Meister ProPR — AI Code Review</h2>
+
+        <div id="config-warning" style="display:none">
+            <p>
+                Please configure the extension in
+                <strong>Project Settings → Meister ProPR</strong>
+                before using.
+            </p>
+        </div>
+
+        <div id="input-section">
+            <div class="form-group">
+                <label for="repo-select">Repository</label>
+                <select id="repo-select">
+                    <option value="">— Select a repository —</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pr-id">Pull Request ID</label>
+                <input type="number" id="pr-id" placeholder="e.g. 42" min="1">
+            </div>
+
+            <button id="review-btn">Review with AI</button>
+        </div>
+
+        <div id="loading" style="display:none">Reviewing pull request…</div>
+
+        <div id="error-message" style="display:none"></div>
+
+        <div id="results-section" style="display:none">
+            <h3>Review Summary</h3>
+            <div id="review-summary"></div>
+
+            <h3>Comments</h3>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Line</th>
+                        <th>Severity</th>
+                        <th>Comment</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="dist/review.js"></script>
+</body>
+</html>

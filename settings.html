@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meister ProPR — Settings</title>
+</head>
+<body>
+    <div id="settings-root">
+        <h2>Meister ProPR — Settings</h2>
+
+        <div class="form-group">
+            <label for="backend-url">Backend URL</label>
+            <input type="url" id="backend-url" placeholder="https://your-backend.example.com">
+        </div>
+
+        <div class="form-group">
+            <label for="client-key">Client Key</label>
+            <input type="password" id="client-key" placeholder="Your client key">
+        </div>
+
+        <button id="save-btn">Save Settings</button>
+        <div id="status-message"></div>
+    </div>
+
+    <script src="dist/settings.js"></script>
+</body>
+</html>

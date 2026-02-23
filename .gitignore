@@ -1,0 +1,16 @@
+# General / OS
+.DS_Store
+Thumbs.db
+*.env
+*.env.local
+.idea
+.claude
+.vscode
+
+# Node.js / Extension
+node_modules/
+dist/
+src/generated/
+*.vsix
+npm-debug.log*
+yarn-error.log

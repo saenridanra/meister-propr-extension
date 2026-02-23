@@ -1,0 +1,28 @@
+{
+  "name": "meister-propr-extension",
+  "version": "1.0.0",
+  "description": "Azure DevOps extension for AI-powered code review of pull requests using Microsoft Foundry agents",
+  "private": true,
+  "scripts": {
+    "build": "webpack",
+    "build:dev": "webpack --mode development",
+    "generate:api": "openapi-typescript-codegen --input ../meister-propr/openapi.json --output src/generated",
+    "package": "tfx extension create --manifest-globs vss-extension.json"
+  },
+  "dependencies": {
+    "azure-devops-extension-api": "^4.266.0",
+    "azure-devops-extension-sdk": "^4.2.0",
+    "axios": "^1.7.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "css-loader": "^7.1.2",
+    "openapi-typescript-codegen": "^0.29.0",
+    "style-loader": "^4.0.0",
+    "tfx-cli": "^0.17.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.7.2",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
+}
