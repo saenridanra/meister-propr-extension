@@ -141,13 +141,14 @@ async function main(): Promise<void> {
                 gitClient.getPullRequestIterations(repoId, prId, projectId),
                 SDK.getAccessToken(),
             ]);
+
             const latestIteration = iterations?.at(-1);
             if (!latestIteration?.id) {
                 throw new Error('Could not determine the latest PR iteration.');
             }
 
             const request: ReviewRequest = {
-                organizationUrl,
+                organizationUrl: orgUrl,
                 projectId,
                 repositoryId: repoId,
                 pullRequestId: prId,
