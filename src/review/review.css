@@ -56,16 +56,55 @@ h3 {
     font-family: inherit;
 }
 
-.form-group input[type="number"] {
-    max-width: 160px;
-}
-
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
     border-color: #0078d4;
     box-shadow: 0 0 0 1px #0078d4;
 }
+
+/* Autocomplete */
+
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    max-height: 220px;
+    overflow-y: auto;
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.autocomplete-dropdown li {
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.autocomplete-dropdown li:hover,
+.autocomplete-dropdown li.autocomplete-focused {
+    background: #f3f2f1;
+}
+
+.autocomplete-dropdown li.autocomplete-status {
+    color: #666;
+    cursor: default;
+    font-style: italic;
+}
+
+/* Primary action button */
 
 button {
     padding: 7px 16px;
@@ -86,6 +125,21 @@ button:disabled {
     cursor: not-allowed;
 }
 
+/* Inline link-style buttons (e.g. "View results" in jobs table) */
+
+.btn-link {
+    background: none;
+    color: #0078d4;
+    padding: 0;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+.btn-link:hover:not(:disabled) {
+    background: none;
+    color: #106ebe;
+}
+
 #loading {
     margin-top: 16px;
     font-style: italic;
@@ -99,6 +153,12 @@ button:disabled {
     border: 1px solid #c40000;
     border-radius: 3px;
     color: #a80000;
+}
+
+.results-context {
+    margin: 0 0 10px;
+    font-size: 12px;
+    color: #666;
 }
 
 #review-summary {
@@ -149,4 +209,59 @@ button:disabled {
 
 #results-table tr[data-severity="suggestion"] td:nth-child(3) {
     color: #0078d4;
+}
+
+/* Jobs overview table */
+
+#jobs-section {
+    margin-top: 32px;
+    border-top: 1px solid #edebe9;
+    padding-top: 8px;
+}
+
+#jobs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+#jobs-table th,
+#jobs-table td {
+    border: 1px solid #ddd;
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+#jobs-table th {
+    background: #f3f2f1;
+    font-weight: 600;
+}
+
+#jobs-table tbody tr:nth-child(even) {
+    background: #faf9f8;
+}
+
+#jobs-table tbody tr:hover {
+    background: #edebe9;
+}
+
+#jobs-table td[data-status="pending"] {
+    color: #666;
+}
+
+#jobs-table td[data-status="processing"] {
+    color: #0078d4;
+    font-weight: 600;
+}
+
+#jobs-table td[data-status="completed"] {
+    color: #107c10;
+    font-weight: 600;
+}
+
+#jobs-table td[data-status="failed"] {
+    color: #a80000;
+    font-weight: 600;
 }

@@ -14,6 +14,19 @@ const MOCK_REPOS = [
     { id: 'mock-repo-2', name: 'MyFrontendRepo' },
 ];
 
+// Mock open pull requests per repo (keyed by repo ID)
+const MOCK_PRS: Record<string, { pullRequestId: number; title: string }[]> = {
+    'mock-repo-1': [
+        { pullRequestId: 101, title: 'Add user authentication flow' },
+        { pullRequestId: 104, title: 'Fix null pointer in payment service' },
+    ],
+    'mock-repo-2': [
+        { pullRequestId: 23,  title: 'Update dependencies and refactor utils' },
+        { pullRequestId: 25,  title: 'Improve error handling in API layer' },
+        { pullRequestId: 27,  title: 'Add dark mode support' },
+    ],
+};
+
 const MOCK_ITERATIONS = [{ id: 1 }, { id: 2 }];
 
 // ---------------------------------------------------------------------------
@@ -41,6 +54,8 @@ export type IExtensionDataService = {
 
 const mockGitClient = {
     getRepositories: async (_projectId: string) => MOCK_REPOS,
+    getPullRequests: async (repoId: string, _searchCriteria?: unknown, _projectId?: string) =>
+        MOCK_PRS[repoId] ?? [],
     getPullRequestIterations: async (_repoId: string, _prId: number, _projectId?: string) => MOCK_ITERATIONS,
 };
 

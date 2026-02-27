@@ -26,19 +26,24 @@
             </div>
 
             <div class="form-group">
-                <label for="pr-id">Pull Request ID</label>
-                <input type="number" id="pr-id" placeholder="e.g. 42" min="1">
+                <label for="pr-search">Pull Request</label>
+                <div class="autocomplete-wrapper">
+                    <input type="text" id="pr-search" placeholder="Select a repository first"
+                           autocomplete="off" spellcheck="false" disabled>
+                    <ul id="pr-dropdown" class="autocomplete-dropdown" hidden></ul>
+                </div>
             </div>
 
             <button id="review-btn">Review with AI</button>
         </div>
 
-        <div id="loading" style="display:none">Reviewing pull request…</div>
+        <div id="loading" style="display:none">Submitting review…</div>
 
         <div id="error-message" style="display:none"></div>
 
         <div id="results-section" style="display:none">
             <h3>Review Summary</h3>
+            <p id="results-context" class="results-context"></p>
             <div id="review-summary"></div>
 
             <h3>Comments</h3>
@@ -52,6 +57,23 @@
                     </tr>
                 </thead>
                 <tbody id="results-body"></tbody>
+            </table>
+        </div>
+
+        <div id="jobs-section" style="display:none">
+            <h3>Recent Reviews</h3>
+            <table id="jobs-table">
+                <thead>
+                    <tr>
+                        <th>PR</th>
+                        <th>Repository</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Completed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="jobs-body"></tbody>
             </table>
         </div>
     </div>
