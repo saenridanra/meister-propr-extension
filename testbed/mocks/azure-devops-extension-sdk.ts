@@ -7,10 +7,6 @@
  * browser console if you want to make real backend calls.
  */
 
-// ---------------------------------------------------------------------------
-// Mock IExtensionDataService backed by localStorage
-// ---------------------------------------------------------------------------
-
 const mockDataManager = {
     getValue: async <T>(key: string, options?: { scopeType?: string; defaultValue?: T }): Promise<T> => {
         const raw = localStorage.getItem(`ado-ext:${key}`);
@@ -28,10 +24,6 @@ const mockDataManager = {
 const mockExtensionDataService = {
     getExtensionDataManager: async (_id: string, _token: string) => mockDataManager,
 };
-
-// ---------------------------------------------------------------------------
-// SDK stubs
-// ---------------------------------------------------------------------------
 
 export async function init(_options?: { loaded?: boolean }): Promise<void> {
     // no-op: in ADO this would handshake with the host frame

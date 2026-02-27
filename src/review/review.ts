@@ -6,19 +6,11 @@ import { submitReview, getReviewStatus, listReviews } from '../api/reviewClient'
 import type { ReviewComment, ReviewListItem, ReviewRequest } from '../api/models';
 import './review.css';
 
-// ---------------------------------------------------------------------------
-// DOM helpers
-// ---------------------------------------------------------------------------
-
 function el<T extends HTMLElement>(id: string): T {
     return document.getElementById(id) as T;
 }
 function show(element: HTMLElement): void { element.style.display = ''; }
 function hide(element: HTMLElement): void { element.style.display = 'none'; }
-
-// ---------------------------------------------------------------------------
-// Comment rendering
-// ---------------------------------------------------------------------------
 
 function severityLabel(severity: ReviewComment['severity']): string {
     const map: Record<ReviewComment['severity'], string> = {
@@ -46,10 +38,6 @@ function renderCommentRow(comment: ReviewComment): HTMLTableRowElement {
     }
     return tr;
 }
-
-// ---------------------------------------------------------------------------
-// Jobs table rendering
-// ---------------------------------------------------------------------------
 
 function formatTime(iso: string | null): string {
     if (!iso) return '—';
@@ -106,29 +94,16 @@ function renderJobsTable(
     }
 }
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
 const JOBS_REFRESH_MS = 5_000;
-
-// ---------------------------------------------------------------------------
-// PR item type (normalised from GitPullRequest)
-// ---------------------------------------------------------------------------
 
 interface PrItem {
     pullRequestId: number;
     title: string;
 }
 
-// ---------------------------------------------------------------------------
-// Main
-// ---------------------------------------------------------------------------
-
 async function main(): Promise<void> {
     await SDK.init({ loaded: false });
 
-    // --- DOM refs ---
     const configWarning  = el<HTMLDivElement>('config-warning');
     const inputSection   = el<HTMLDivElement>('input-section');
     const repoSelect     = el<HTMLSelectElement>('repo-select');
@@ -144,7 +119,6 @@ async function main(): Promise<void> {
     const jobsSection    = el<HTMLDivElement>('jobs-section');
     const jobsBody       = el<HTMLTableSectionElement>('jobs-body');
 
-    // --- Settings ---
     const settings = await loadSettings();
     const { backendUrl, clientKey } = settings;
 
@@ -184,10 +158,6 @@ async function main(): Promise<void> {
     } catch {
         // Repo list is informational; continue without it
     }
-
-    // =========================================================================
-    // PR autocomplete
-    // =========================================================================
 
     let selectedPrId: number | null = null;
     let prCache: PrItem[] | null    = null;
@@ -346,10 +316,6 @@ async function main(): Promise<void> {
         prSearch.placeholder = hasRepo ? 'Type to search pull requests…' : 'Select a repository first';
     });
 
-    // =========================================================================
-    // Jobs overview — always-running poll
-    // =========================================================================
-
     async function doRefreshJobs(): Promise<void> {
         try {
             const jobList = await listReviews(backendUrl!, clientKey!);
@@ -395,10 +361,6 @@ async function main(): Promise<void> {
     await doRefreshJobs();
     show(jobsSection);
     setInterval(doRefreshJobs, JOBS_REFRESH_MS);
-
-    // =========================================================================
-    // Review submission — non-blocking; button re-enables after submit
-    // =========================================================================
 
     reviewBtn.addEventListener('click', async () => {
         hide(errorDiv);

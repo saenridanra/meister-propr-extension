@@ -38,10 +38,6 @@ import {randomUUID, X509Certificate} from 'crypto';
 import selfsigned from 'selfsigned';
 import type {IncomingMessage, ServerResponse} from 'http';
 
-// ---------------------------------------------------------------------------
-// Configuration
-// ---------------------------------------------------------------------------
-
 const PORT = parseInt(process.env['PORT'] ?? '31001', 10);
 const CLIENT_KEY = process.env['CLIENT_KEY'] ?? 'test-client-key';
 const SIMULATE = process.env['SIMULATE'] ?? 'success';   // 'success' | 'fail'
@@ -51,10 +47,6 @@ const HTTP_ONLY = process.env['HTTP_ONLY'] === 'true';
 const CERT_FILE = path.join(__dirname, 'localhost-cert.pem');
 const KEY_FILE = path.join(__dirname, 'localhost-key.pem');
 const RENEW_BEFORE_DAYS = 30;
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 type JobStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
@@ -92,15 +84,7 @@ interface ReviewRequest {
     iterationId: number;
 }
 
-// ---------------------------------------------------------------------------
-// In-memory job store
-// ---------------------------------------------------------------------------
-
 const jobs = new Map<string, Job>();
-
-// ---------------------------------------------------------------------------
-// Mock review results
-// ---------------------------------------------------------------------------
 
 const MOCK_SUCCESS_RESULT: ReviewResult = {
     summary:
@@ -149,10 +133,6 @@ const MOCK_SUCCESS_RESULT: ReviewResult = {
 const MOCK_FAIL_ERROR =
     'The AI agent could not complete the review: unable to retrieve the diff for pull request ' +
     '(simulated failure — set SIMULATE=success to test the success path).';
-
-// ---------------------------------------------------------------------------
-// Job lifecycle helpers
-// ---------------------------------------------------------------------------
 
 function scheduleJob(jobId: string): void {
     const processingDelay = Math.min(2000, DELAY_MS * 0.33);
@@ -215,10 +195,6 @@ function jobToStatusResponse(job: Job) {
     return {...jobToListItem(job), result: job.result, error: job.error};
 }
 
-// ---------------------------------------------------------------------------
-// Request helpers
-// ---------------------------------------------------------------------------
-
 const ALLOWED_ORIGINS = [
     // Local testbed
     /^https?:\/\/localhost(:\d+)?$/,
@@ -274,10 +250,6 @@ function checkAuth(req: IncomingMessage, res: ServerResponse): boolean {
     }
     return true;
 }
-
-// ---------------------------------------------------------------------------
-// Router
-// ---------------------------------------------------------------------------
 
 async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const origin = req.headers['origin'] ?? '';
@@ -337,10 +309,6 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     send(res, 404, {error: 'Not found'});
 }
 
-// ---------------------------------------------------------------------------
-// Certificate — load from disk or generate a fresh one
-// ---------------------------------------------------------------------------
-
 function loadOrGenerateCert(): { cert: string; key: string } {
     if (fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)) {
         try {
@@ -383,10 +351,6 @@ function loadOrGenerateCert(): { cert: string; key: string } {
     console.log(`  Generated new certificate (valid 365 days) → ${CERT_FILE}`);
     return {cert: pems.cert, key: pems.private};
 }
-
-// ---------------------------------------------------------------------------
-// Start
-// ---------------------------------------------------------------------------
 
 const proto = HTTP_ONLY ? 'http' : 'https';
 const server = HTTP_ONLY
