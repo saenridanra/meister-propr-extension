@@ -18,3 +18,5 @@ yarn-error.log
 # Testbed
 testbed/dist/
 testbed/node_modules/
+testbed/localhost-cert.pem
+testbed/localhost-key.pem

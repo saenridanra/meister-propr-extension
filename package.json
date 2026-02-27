@@ -1,6 +1,6 @@
 {
   "name": "meister-propr-extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Azure DevOps extension for AI-powered code review of pull requests using Microsoft Foundry agents",
   "private": true,
   "scripts": {
@@ -11,7 +11,7 @@
     "testbed:build":   "webpack --config webpack.testbed.config.js --mode development",
     "testbed:watch":   "webpack --config webpack.testbed.config.js --mode development --watch",
     "testbed:serve":   "node testbed/server.js",
-    "testbed:backend": "node testbed/backend.js"
+    "testbed:backend": "npm run backend --prefix testbed"
   },
   "dependencies": {
     "azure-devops-extension-api": "^4.266.0",

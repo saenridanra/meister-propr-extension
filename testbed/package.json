@@ -4,9 +4,14 @@
   "description": "Local testbed server for the Meister ProPR extension",
   "scripts": {
     "start":   "node server.js",
-    "backend": "node backend.js"
+    "backend": "tsx backend.ts"
   },
   "dependencies": {
     "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "selfsigned": "^2.4.1",
+    "tsx": "^4.19.2"
   }
 }
