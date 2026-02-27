@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The backend is maintained in a **separate repository**. This repository contains only the extension.
 
-## Extension (`extension/`)
+## Extension (`this repo`)
 
 **Build commands:**
 - `npm run build` — production webpack build

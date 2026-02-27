@@ -1,7 +1,6 @@
 {
     "manifestVersion": 1,
     "id": "meister-propr",
-    "version": "1.0.1",
     "name": "Meister ProPR",
     "description": "AI-powered code review for Azure DevOps pull requests, powered by Microsoft Foundry agents",
     "publisher": "meister-propr-test-extension",
