@@ -14,3 +14,7 @@ src/generated/
 *.vsix
 npm-debug.log*
 yarn-error.log
+
+# Testbed
+testbed/dist/
+testbed/node_modules/
