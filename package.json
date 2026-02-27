@@ -8,8 +8,10 @@
     "build:dev": "webpack --mode development",
     "generate:api": "openapi-typescript-codegen --input api/openapi.json --output src/generated",
     "package": "node scripts/package.js",
-    "testbed:build": "webpack --config webpack.testbed.config.js --mode development",
-    "testbed:watch": "webpack --config webpack.testbed.config.js --mode development --watch"
+    "testbed:build":   "webpack --config webpack.testbed.config.js --mode development",
+    "testbed:watch":   "webpack --config webpack.testbed.config.js --mode development --watch",
+    "testbed:serve":   "node testbed/server.js",
+    "testbed:backend": "node testbed/backend.js"
   },
   "dependencies": {
     "azure-devops-extension-api": "^4.266.0",

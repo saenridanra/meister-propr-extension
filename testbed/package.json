@@ -3,7 +3,8 @@
   "private": true,
   "description": "Local testbed server for the Meister ProPR extension",
   "scripts": {
-    "start": "node server.js"
+    "start":   "node server.js",
+    "backend": "node backend.js"
   },
   "dependencies": {
     "express": "^4.21.0"
