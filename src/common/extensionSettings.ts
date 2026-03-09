@@ -4,11 +4,13 @@ import { CommonServiceIds, IExtensionDataService } from 'azure-devops-extension-
 export interface ExtensionSettings {
     backendUrl: string;
     clientKey: string;
+    clientId: string;
 }
 
 const KEYS = {
     backendUrl: 'backendUrl',
     clientKey:  'clientKey',
+    clientId:   'clientId',
 } as const;
 
 async function getDataManager() {
@@ -18,11 +20,12 @@ async function getDataManager() {
 
 export async function loadSettings(): Promise<Partial<ExtensionSettings>> {
     const dm = await getDataManager();
-    const [backendUrl, clientKey] = await Promise.all([
+    const [backendUrl, clientKey, clientId] = await Promise.all([
         dm.getValue<string>(KEYS.backendUrl, { scopeType: 'Default', defaultValue: '' }),
         dm.getValue<string>(KEYS.clientKey,  { scopeType: 'Default', defaultValue: '' }),
+        dm.getValue<string>(KEYS.clientId,   { scopeType: 'Default', defaultValue: '' }),
     ]);
-    return { backendUrl, clientKey };
+    return { backendUrl, clientKey, clientId };
 }
 
 export async function saveSettings(settings: ExtensionSettings): Promise<void> {
@@ -30,5 +33,16 @@ export async function saveSettings(settings: ExtensionSettings): Promise<void> {
     await Promise.all([
         dm.setValue(KEYS.backendUrl, settings.backendUrl, { scopeType: 'Default' }),
         dm.setValue(KEYS.clientKey,  settings.clientKey,  { scopeType: 'Default' }),
+        dm.setValue(KEYS.clientId,   settings.clientId,   { scopeType: 'Default' }),
     ]);
+}
+
+export async function loadProjectCrawlReviewerName(projectId: string): Promise<string> {
+    const dm = await getDataManager();
+    return dm.getValue<string>(`crawlReviewerDisplayName_${projectId}`, { scopeType: 'Default', defaultValue: '' });
+}
+
+export async function saveProjectCrawlReviewerName(projectId: string, name: string): Promise<void> {
+    const dm = await getDataManager();
+    await dm.setValue(`crawlReviewerDisplayName_${projectId}`, name, { scopeType: 'Default' });
 }

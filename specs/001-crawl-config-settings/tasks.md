@@ -19,12 +19,11 @@
 
 **Purpose**: Install and configure the test runner. No test runner means no TDD — must complete before any [TEST] tasks.
 
-- [ ] T000 Run `npm run generate:api` to generate the typed TypeScript client from `api/openapi.json` into `src/generated/`; commit the generated directory — this produces `ClientsService`, `CrawlConfigResponse`, `CreateCrawlConfigRequest`, and related types used by all subsequent tasks
-- [ ] T001 Add `jest`, `ts-jest`, and `@types/jest` to `devDependencies` in `package.json` and add `"test": "jest"` and `"test:watch": "jest --watch"` to `scripts`
-- [ ] T002 Create `jest.config.js` at repository root with `ts-jest` preset, `testEnvironment: "node"`, `testMatch: ["**/tests/**/*.test.ts"]`, and `moduleNameMapper` entries for `azure-devops-extension-sdk`, `azure-devops-extension-api`, and `axios`
-- [ ] T003 [P] Create `tests/__mocks__/azure-devops-extension-sdk.ts` exporting jest mock functions for `init`, `getAccessToken`, `getPageContext`, `getHost`, `notifyLoadSucceeded`, and `getExtensionContext`
-- [ ] T004 [P] Create `tests/__mocks__/azure-devops-extension-api.ts` exporting a jest mock for `CommonServiceIds.ExtensionDataService` and a factory for a mock `IExtensionDataManager` with `getValue` and `setValue` as `jest.fn()`
-- [ ] T005 [P] Create `tests/__mocks__/axios.ts` exporting `axios.get`, `axios.post`, `axios.delete` as `jest.fn()` — kept for safety (existing `reviewClient.ts` uses axios); crawl config tests will mock `ClientsService` inline via `jest.mock()`
+- [x] T001 Add `jest`, `ts-jest`, and `@types/jest` to `devDependencies` in `package.json` and add `"test": "jest"` and `"test:watch": "jest --watch"` to `scripts`
+- [x] T002 Create `jest.config.js` at repository root with `ts-jest` preset, `testEnvironment: "node"`, `testMatch: ["**/tests/**/*.test.ts"]`, and `moduleNameMapper` entries for `azure-devops-extension-sdk`, `azure-devops-extension-api`, and `axios`
+- [x] T003 [P] Create `tests/__mocks__/azure-devops-extension-sdk.ts` exporting jest mock functions for `init`, `getAccessToken`, `getPageContext`, `getHost`, `notifyLoadSucceeded`, and `getExtensionContext`
+- [x] T004 [P] Create `tests/__mocks__/azure-devops-extension-api.ts` exporting a jest mock for `CommonServiceIds.ExtensionDataService` and a factory for a mock `IExtensionDataManager` with `getValue` and `setValue` as `jest.fn()`
+- [x] T005 [P] Create `tests/__mocks__/axios.ts` exporting `axios.get`, `axios.post`, `axios.delete` as `jest.fn()` returning resolved promises by default
 
 **Checkpoint**: Run `npm test` — should report zero test suites found (no test files yet). Jest setup is confirmed working.
 
@@ -40,14 +39,13 @@
 
 > **Write these tests FIRST — confirm they FAIL before writing implementation**
 
-- [ ] T006 Write failing tests in `tests/extensionSettings.test.ts` covering: (a) `loadSettings` returns `clientId` from extension data; (b) `saveSettings` persists `clientId` via `setValue`; (c) `loadProjectCrawlReviewerName` returns stored string for project ID key; (d) `loadProjectCrawlReviewerName` returns empty string when key missing; (e) `saveProjectCrawlReviewerName` calls `setValue` with key `crawlReviewerDisplayName_{projectId}` and the provided name; (f) `saveProjectCrawlReviewerName` called with empty string clears the stored value
+- [x] T006 Write failing tests in `tests/extensionSettings.test.ts` covering: (a) `loadSettings` returns `clientId` from extension data; (b) `saveSettings` persists `clientId` via `setValue`; (c) `loadProjectCrawlReviewerName` returns stored string for project ID key; (d) `loadProjectCrawlReviewerName` returns empty string when key missing; (e) `saveProjectCrawlReviewerName` calls `setValue` with key `crawlReviewerDisplayName_{projectId}` and the provided name; (f) `saveProjectCrawlReviewerName` called with empty string clears the stored value
 
 ### Implementation for Foundational
 
-- [ ] T007 Extend `ExtensionSettings` interface in `src/common/extensionSettings.ts` to add `clientId: string`; update `KEYS` constant with `clientId: 'clientId'`; update `loadSettings()` to read `clientId` and `saveSettings()` to write it
-- [ ] T008 Add `loadProjectCrawlReviewerName(projectId: string): Promise<string>` function to `src/common/extensionSettings.ts` that reads `crawlReviewerDisplayName_{projectId}` from extension data (returns `''` if not found)
-- [ ] T009 Add `saveProjectCrawlReviewerName(projectId: string, name: string): Promise<void>` function to `src/common/extensionSettings.ts` that writes or clears `crawlReviewerDisplayName_{projectId}` in extension data
-- [ ] T009a Create `src/settings/crawlConfigOrchestrator.ts` with stub exports: `runCrawlConfigSave(params: { reviewerDisplayName: string; orgUrl: string; projectId: string; backendUrl: string; clientKey: string; clientId: string; }): Promise<void>` (stub throws `Error('not implemented')`) and `loadCrawlConfigState(projectId: string): Promise<string>` (stub returns `Promise.resolve('')`); zero DOM access in this file — pure orchestration only
+- [x] T007 Extend `ExtensionSettings` interface in `src/common/extensionSettings.ts` to add `clientId: string`; update `KEYS` constant with `clientId: 'clientId'`; update `loadSettings()` to read `clientId` and `saveSettings()` to write it
+- [x] T008 Add `loadProjectCrawlReviewerName(projectId: string): Promise<string>` function to `src/common/extensionSettings.ts` that reads `crawlReviewerDisplayName_{projectId}` from extension data (returns `''` if not found)
+- [x] T009 Add `saveProjectCrawlReviewerName(projectId: string, name: string): Promise<void>` function to `src/common/extensionSettings.ts` that writes or clears `crawlReviewerDisplayName_{projectId}` in extension data
 
 **Checkpoint**: Run `npm test` — `tests/extensionSettings.test.ts` tests should now pass (GREEN). Foundation ready.
 
@@ -63,18 +61,18 @@
 
 > **Write these tests FIRST — confirm they FAIL before writing implementation**
 
-- [ ] T010 [P] Write failing tests in `tests/crawlConfigClient.test.ts` using `jest.mock('../../src/generated/services/ClientsService')` to mock `ClientsService`; cover `listCrawlConfigs` wrapper: (a) calls `ClientsService.clientsGetCrawlConfigurations(clientId)` and sets `OpenAPI.BASE`/`OpenAPI.HEADERS` correctly; (b) returns result on success; (c) re-throws `ApiError` as plain `Error` with `error.body?.detail`; cover `createCrawlConfig` wrapper: (d) calls `clientsCreateCrawlConfiguration` with body including `crawlIntervalSeconds: 300`; (e) re-throws `ApiError` with detail; (f) succeeds on mocked success response — types for `CrawlConfigResponse`/`CreateCrawlConfigRequest` imported from `src/generated/models/`
-- [ ] T011 [P] Write failing tests in `tests/settings-crawl.test.ts` targeting `runCrawlConfigSave` from `src/settings/crawlConfigOrchestrator.ts` (mock `listCrawlConfigs`, `createCrawlConfig`, `deleteCrawlConfig`, `saveProjectCrawlReviewerName`): (a) non-empty name + no matching config → `createCrawlConfig` called once with correct args; (b) non-empty name + matching config → `createCrawlConfig` NOT called; (c) after successful create, `saveProjectCrawlReviewerName` called with the display name; (d) `listCrawlConfigs` throws → error re-thrown, no create attempted; (e) empty name + matching config → `deleteCrawlConfig` called with correct `configId`; (f) empty name + no config → `deleteCrawlConfig` NOT called; (g) after delete, `saveProjectCrawlReviewerName` called with `''`; also write tests for `loadCrawlConfigState`: (h) stored name returned; (i) no stored name → empty string
+- [x] T010 [P] Write failing tests in `tests/crawlConfigClient.test.ts` covering `listCrawlConfigs`: (a) returns parsed `CrawlConfigResponse[]` on HTTP 200; (b) throws with message detail on HTTP 401; (c) throws with message detail on HTTP 403; and `createCrawlConfig`: (d) sends correct request body (`organizationUrl`, `projectId`, `reviewerDisplayName`, `crawlIntervalSeconds: 300`) with `X-Client-Key` header; (e) returns parsed `CrawlConfigResponse` on HTTP 201; (f) throws on HTTP 4xx with backend `ProblemDetails.detail` as error message
+- [x] T011 [P] Write failing tests in `tests/settings-crawl.test.ts` covering the US1 save logic: (a) reviewer name non-empty + no matching config exists → `createCrawlConfig` is called once with correct args; (b) reviewer name non-empty + matching config already exists → `createCrawlConfig` is NOT called; (c) after successful create, `saveProjectCrawlReviewerName` is called with the display name; (d) `listCrawlConfigs` throws → error message is displayed, no create attempted
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] Create `src/api/crawlConfigClient.ts` with: `DEFAULT_CRAWL_INTERVAL_SECONDS = 300` constant; `listCrawlConfigs(backendUrl: string, clientKey: string, clientId: string): Promise<CrawlConfigResponse[]>` that sets `OpenAPI.BASE = backendUrl` and `OpenAPI.HEADERS = { 'X-Client-Key': clientKey }` then calls `ClientsService.clientsGetCrawlConfigurations(clientId)` from `src/generated/`; catch `ApiError` and re-throw as `new Error(err.body?.detail ?? err.message)` — types `CrawlConfigResponse` and `ApiError` imported from `src/generated/`
-- [ ] T013 Add `createCrawlConfig(backendUrl: string, clientKey: string, clientId: string, request: CreateCrawlConfigRequest): Promise<CrawlConfigResponse>` to `src/api/crawlConfigClient.ts` that configures `OpenAPI.BASE`/`OpenAPI.HEADERS` and calls `ClientsService.clientsCreateCrawlConfiguration(clientId, request)` from `src/generated/`; catch `ApiError` and re-throw as `new Error(err.body?.detail ?? err.message)`
-- [ ] T014 [P] Add Client ID input field (`<input type="text" id="client-id">`) to the form in `settings.html`; add Crawl Configuration section with heading, description paragraph, and reviewer display name input (`<input type="text" id="reviewer-display-name">`) below a `<hr class="section-divider">`
-- [ ] T015 Update `src/settings/settings.ts` init: read the `client-id` and `reviewer-display-name` DOM elements; populate `client-id` from `settings.clientId`
-- [ ] T016 Update `src/settings/settings.ts` save handler to include `clientId` from the `client-id` input in the `updated` settings object passed to `saveSettings`
-- [ ] T017 Implement crawl config save wiring in `src/settings/settings.ts` save handler: call `SDK.getPageContext()` and `SDK.getHost()` to get `projectId` and `orgUrl`; if `clientId` is set, call `runCrawlConfigSave({ reviewerDisplayName, orgUrl, projectId, backendUrl, clientKey, clientId })` from `src/settings/crawlConfigOrchestrator.ts`; catch any thrown `Error` and display its message in `statusMsg` with `status-error` class; on success append to existing success message
-- [ ] T018 [P] Add `.section-divider` (thin border `#eee`, margin top/bottom) and `.section-description` (color `#605e5c`, font-size `0.9em`) styles to `src/settings/settings.css`; add `h3` margin/weight styles matching ADO conventions
+- [x] T012 [P] Create `src/api/crawlConfigClient.ts` with: `CrawlConfigResponse` interface, `CreateCrawlConfigRequest` interface, `DEFAULT_CRAWL_INTERVAL_SECONDS = 300` constant, and `listCrawlConfigs(backendUrl, clientKey, clientId): Promise<CrawlConfigResponse[]>` function using `axios.get` with `X-Client-Key` header and error extraction from `ProblemDetails`
+- [x] T013 Add `createCrawlConfig(backendUrl, clientKey, clientId, request): Promise<CrawlConfigResponse>` to `src/api/crawlConfigClient.ts` using `axios.post` with `X-Client-Key` header and matching error extraction
+- [x] T014 [P] Add Client ID input field (`<input type="text" id="client-id">`) to the form in `settings.html`; add Crawl Configuration section with heading, description paragraph, and reviewer display name input (`<input type="text" id="reviewer-display-name">`) below a `<hr class="section-divider">`
+- [x] T015 Update `src/settings/settings.ts` init: read the `client-id` and `reviewer-display-name` DOM elements; populate `client-id` from `settings.clientId`
+- [x] T016 Update `src/settings/settings.ts` save handler to include `clientId` from the `client-id` input in the `updated` settings object passed to `saveSettings`
+- [x] T017 Implement US1 crawl config create logic in `src/settings/settings.ts` save handler: call `SDK.getPageContext()` and `SDK.getHost()` to get `projectId` and `orgUrl`; if `reviewerDisplayName` is non-empty and `clientId` is set, call `listCrawlConfigs`, check for a match on `organizationUrl` + `projectId`, and if no match call `createCrawlConfig` then `saveProjectCrawlReviewerName`
+- [x] T018 [P] Add `.section-divider` (thin border `#eee`, margin top/bottom) and `.section-description` (color `#605e5c`, font-size `0.9em`) styles to `src/settings/settings.css`; add `h3` margin/weight styles matching ADO conventions
 
 **Checkpoint**: All US1 tests GREEN. Manual test: settings page loads, client ID field present, reviewer name field present, saving with a valid name triggers the list+create flow. Save with same name a second time → no second create call.
 
@@ -90,13 +88,13 @@
 
 > **Write these tests FIRST — confirm they FAIL before writing implementation**
 
-- [ ] T019 [P] Add failing tests to `tests/crawlConfigClient.test.ts` covering `deleteCrawlConfig` wrapper: (a) calls `ClientsService.clientsDeleteCrawlConfiguration(clientId, configId)` and sets `OpenAPI.BASE`/`OpenAPI.HEADERS`; (b) resolves on success; (c) treats `ApiError` with `status === 404` as success (idempotent); (d) re-throws other `ApiError` with `error.body?.detail`
-- [ ] T020 [P] Add failing tests to `tests/settings-crawl.test.ts` covering the US2 save logic: (a) reviewer name empty + matching config exists → `deleteCrawlConfig` called with correct `configId`; (b) reviewer name empty + no matching config → `deleteCrawlConfig` NOT called; (c) after successful delete, `saveProjectCrawlReviewerName` called with empty string; (d) `deleteCrawlConfig` returns 404 → treated as success, no error shown
+- [x] T019 [P] Add failing tests to `tests/crawlConfigClient.test.ts` covering `deleteCrawlConfig`: (a) sends DELETE to correct URL with `X-Client-Key` header on HTTP 204; (b) treats HTTP 404 as success (idempotent); (c) throws on HTTP 401; (d) throws on HTTP 403
+- [x] T020 [P] Add failing tests to `tests/settings-crawl.test.ts` covering the US2 save logic: (a) reviewer name empty + matching config exists → `deleteCrawlConfig` called with correct `configId`; (b) reviewer name empty + no matching config → `deleteCrawlConfig` NOT called; (c) after successful delete, `saveProjectCrawlReviewerName` called with empty string; (d) `deleteCrawlConfig` returns 404 → treated as success, no error shown
 
 ### Implementation for User Story 2
 
-- [ ] T021 Add `deleteCrawlConfig(backendUrl: string, clientKey: string, clientId: string, configId: string): Promise<void>` to `src/api/crawlConfigClient.ts` that configures `OpenAPI.BASE`/`OpenAPI.HEADERS` and calls `ClientsService.clientsDeleteCrawlConfiguration(clientId, configId)` from `src/generated/`; catch `ApiError`: if `err.status === 404` resolve silently; otherwise re-throw as `new Error(err.body?.detail ?? err.message)`
-- [ ] T022 Implement `runCrawlConfigSave` body in `src/settings/crawlConfigOrchestrator.ts`: call `listCrawlConfigs` to get configs; find match on `organizationUrl` + `projectId`; if `reviewerDisplayName` non-empty and no match → call `createCrawlConfig` then `saveProjectCrawlReviewerName(projectId, reviewerDisplayName)`; if `reviewerDisplayName` empty and match found → call `deleteCrawlConfig(…, match.id)` then `saveProjectCrawlReviewerName(projectId, '')`; if empty and no match → no-op; replace the stub `throw` with this logic
+- [x] T021 Add `deleteCrawlConfig(backendUrl, clientKey, clientId, configId): Promise<void>` to `src/api/crawlConfigClient.ts` using `axios.delete` with `X-Client-Key` header; treat HTTP 404 response as success; extract and throw `ProblemDetails` detail for other errors
+- [x] T022 Extend save logic in `src/settings/settings.ts` to handle empty reviewer display name: call `listCrawlConfigs`, find the matching config for current org + project, if found call `deleteCrawlConfig` with its `id`, then call `saveProjectCrawlReviewerName` with `''`; if no matching config found, complete silently
 
 **Checkpoint**: All US2 tests GREEN. Manual test: with an existing config, clearing the name and saving removes the config. Saving again (still empty) produces no error.
 
@@ -112,13 +110,12 @@
 
 > **Write these tests FIRST — confirm they FAIL before writing implementation**
 
-- [ ] T023 [P] Add failing tests to `tests/settings-crawl.test.ts` targeting `loadCrawlConfigState` from `src/settings/crawlConfigOrchestrator.ts`: (a) calls `loadProjectCrawlReviewerName(projectId)` and returns stored name; (b) no stored name → returns empty string; prerequisite guard behaviour (disabled input when settings missing) is validated manually via quickstart — not unit-testable without DOM
+- [x] T023 [P] Add failing tests to `tests/settings-crawl.test.ts` covering the US3 load logic: (a) stored display name for current project → reviewer display name input is pre-populated; (b) no stored name → reviewer display name input remains empty; (c) backendUrl, clientKey, or clientId missing → reviewer display name input has `disabled` attribute and a warning hint is visible
 
 ### Implementation for User Story 3
 
-- [ ] T024 Update `src/settings/settings.ts` init to call `loadCrawlConfigState(projectId)` from `src/settings/crawlConfigOrchestrator.ts` after the page context is acquired and populate the `reviewer-display-name` input with the result
-- [ ] T024a Implement `loadCrawlConfigState` body in `src/settings/crawlConfigOrchestrator.ts`: replace the stub `return Promise.resolve('')` with a call to `loadProjectCrawlReviewerName(projectId)` from `src/common/extensionSettings.ts` and return its result
-- [ ] T025 Add prerequisite guard in `src/settings/settings.ts` init: if `settings.backendUrl`, `settings.clientKey`, or `settings.clientId` are empty/missing, set the `reviewer-display-name` input to `disabled` and display a hint element reading "Configure Backend URL, Client Key, and Client ID first"
+- [x] T024 Update `src/settings/settings.ts` init to call `loadProjectCrawlReviewerName(projectId)` after the page context is acquired and populate the `reviewer-display-name` input with the result
+- [x] T025 Add prerequisite guard in `src/settings/settings.ts` init: if `settings.backendUrl`, `settings.clientKey`, or `settings.clientId` are empty/missing, set the `reviewer-display-name` input to `disabled` and display a hint element reading "Configure Backend URL, Client Key, and Client ID first"
 
 **Checkpoint**: All US3 tests GREEN. All user stories functional and independently verifiable.
 
@@ -128,9 +125,9 @@
 
 **Purpose**: Build integrity verification and final checks.
 
-- [ ] T026 [P] Run `npx tsc --noEmit` and resolve any TypeScript type errors introduced by the new `clientId` field, new interfaces in `crawlConfigClient.ts`, and updated `extensionSettings.ts` signatures
-- [ ] T027 [P] Run `npm run build` and confirm the production webpack bundle compiles cleanly with no errors
-- [ ] T028 Run `npm test` and confirm all test suites pass (extensionSettings.test.ts, crawlConfigClient.test.ts, settings-crawl.test.ts)
+- [x] T026 [P] Run `npx tsc --noEmit` and resolve any TypeScript type errors introduced by the new `clientId` field, new interfaces in `crawlConfigClient.ts`, and updated `extensionSettings.ts` signatures
+- [x] T027 [P] Run `npm run build` and confirm the production webpack bundle compiles cleanly with no errors
+- [x] T028 Run `npm test` and confirm all test suites pass (extensionSettings.test.ts, crawlConfigClient.test.ts, settings-crawl.test.ts)
 
 ---
 
@@ -161,8 +158,8 @@
 ### Parallel Opportunities
 
 - T003, T004, T005 (mock files) — fully parallel
-- T010, T011 (US1 test files) — fully parallel (different files); both require T009a complete
-- T012, T014, T018 (crawlConfigClient.ts, settings.html, settings.css) — parallel with each other; T012 must complete before T013; T013 and T022 (orchestrator impl) must complete before T017
+- T010, T011 (US1 test files) — fully parallel (different files)
+- T012, T014, T018 (crawlConfigClient.ts, settings.html, settings.css) — parallel with each other; T012 must complete before T013
 - T019, T020 (US2 test files) — fully parallel
 - T026, T027 (build checks) — fully parallel
 
@@ -171,28 +168,22 @@
 ## Parallel Example: User Story 1
 
 ```bash
-# After T009 (extensionSettings helpers complete):
-Task T009a: Create crawlConfigOrchestrator.ts stubs in src/settings/crawlConfigOrchestrator.ts
+# After T009 (Foundational complete), launch in parallel:
+Task T010: Write failing tests for listCrawlConfigs and createCrawlConfig in tests/crawlConfigClient.test.ts
+Task T011: Write failing tests for US1 save logic in tests/settings-crawl.test.ts
 
-# After T009a (stubs exist for tests to import), launch in parallel:
-Task T010: Write failing tests for listCrawlConfigs/createCrawlConfig wrappers in tests/crawlConfigClient.test.ts
-Task T011: Write failing tests for runCrawlConfigSave and loadCrawlConfigState in tests/settings-crawl.test.ts
-
-# After T010+T011 confirmed RED, launch in parallel:
-Task T012: Create crawlConfigClient.ts adapter (listCrawlConfigs) in src/api/crawlConfigClient.ts
+# After T011 confirmed RED, launch in parallel:
+Task T012: Create crawlConfigClient.ts with listCrawlConfigs in src/api/crawlConfigClient.ts
 Task T014: Add Client ID and reviewer display name fields to settings.html
 Task T018: Add section-divider and section-description styles to src/settings/settings.css
 
 # Sequential after T012:
-Task T013: Add createCrawlConfig wrapper to src/api/crawlConfigClient.ts
+Task T013: Add createCrawlConfig to src/api/crawlConfigClient.ts
 
-# Sequential after T013:
-Task T022: Implement runCrawlConfigSave body in src/settings/crawlConfigOrchestrator.ts
-
-# Sequential after T022, T014:
+# Sequential after T013, T014:
 Task T015: Populate clientId input on load in src/settings/settings.ts
 Task T016: Save clientId from form in src/settings/settings.ts
-Task T017: Wire runCrawlConfigSave call into save handler in src/settings/settings.ts
+Task T017: Implement create logic in src/settings/settings.ts
 ```
 
 ---

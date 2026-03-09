@@ -1,29 +1,34 @@
 {
   "name": "meister-propr-extension",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Azure DevOps extension for AI-powered code review of pull requests using Microsoft Foundry agents",
   "private": true,
   "scripts": {
     "build": "webpack",
     "build:dev": "webpack --mode development",
     "generate:api": "openapi-typescript-codegen --input api/openapi.json --output src/generated",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "package": "node scripts/package.js",
-    "testbed:build":   "webpack --config webpack.testbed.config.js --mode development",
-    "testbed:watch":   "webpack --config webpack.testbed.config.js --mode development --watch",
-    "testbed:serve":   "node testbed/server.js",
+    "testbed:build": "webpack --config webpack.testbed.config.js --mode development",
+    "testbed:watch": "webpack --config webpack.testbed.config.js --mode development --watch",
+    "testbed:serve": "node testbed/server.js",
     "testbed:backend": "npm run backend --prefix testbed"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "azure-devops-extension-api": "^4.266.0",
-    "azure-devops-extension-sdk": "^4.2.0",
-    "axios": "^1.7.9"
+    "azure-devops-extension-sdk": "^4.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.10.2",
     "css-loader": "^7.1.2",
+    "jest": "^30.2.0",
     "openapi-typescript-codegen": "^0.29.0",
     "style-loader": "^4.0.0",
     "tfx-cli": "^0.17.0",
+    "ts-jest": "^29.4.6",
     "ts-loader": "^9.5.1",
     "typescript": "^5.7.2",
     "webpack": "^5.97.1",
