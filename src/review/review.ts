@@ -135,6 +135,7 @@ async function main(): Promise<void> {
     const orgUrl      = `https://dev.azure.com/${orgName}/`;
     const projectId   = pageContext.webContext.project.id;
     const gitClient   = getClient(GitRestClient);
+    const adoToken    = await SDK.getAccessToken();
 
     // Repo ID → name map (used by the jobs table)
     const repoNameMap = new Map<string, string>();
@@ -318,7 +319,7 @@ async function main(): Promise<void> {
 
     async function doRefreshJobs(): Promise<void> {
         try {
-            const jobList = await listReviews(backendUrl!, clientKey!);
+            const jobList = await listReviews(backendUrl!, clientKey!, adoToken, orgUrl);
             renderJobsTable(jobsBody, jobList, repoNameMap);
         } catch {
             // Non-critical — backend may be temporarily unreachable
@@ -333,7 +334,7 @@ async function main(): Promise<void> {
 
     async function onViewJobDetails(jobId: string): Promise<void> {
         try {
-            const response = await getReviewStatus(backendUrl!, clientKey!, jobId);
+            const response = await getReviewStatus(backendUrl!, clientKey!, adoToken, orgUrl, jobId);
             hide(errorDiv);
 
             if (response.status === 'completed' && response.result) {
@@ -383,10 +384,7 @@ async function main(): Promise<void> {
         show(loadingDiv);
 
         try {
-            const [iterations, adoToken] = await Promise.all([
-                gitClient.getPullRequestIterations(repoId, prId, projectId),
-                SDK.getAccessToken(),
-            ]);
+            const iterations = await gitClient.getPullRequestIterations(repoId, prId, projectId);
 
             const latestIteration = iterations?.at(-1);
             if (!latestIteration?.id) {
@@ -401,7 +399,7 @@ async function main(): Promise<void> {
                 iterationId:     latestIteration.id,
             };
 
-            await submitReview(backendUrl!, clientKey!, adoToken, request);
+            await submitReview(backendUrl!, clientKey!, adoToken, orgUrl, request);
             // Immediate refresh so the new job appears without waiting for the next tick
             await doRefreshJobs();
             jobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });

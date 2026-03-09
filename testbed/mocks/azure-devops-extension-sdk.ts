@@ -53,16 +53,14 @@ export function getHost() {
     };
 }
 
+const FAKE_ADO_TOKEN = Array.from(crypto.getRandomValues(new Uint8Array(24)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+
+console.log(`[testbed] Fake ADO token for this session: ${FAKE_ADO_TOKEN}`);
+
 export async function getAccessToken(): Promise<string> {
-    const token = localStorage.getItem('testbed:adoToken') ?? '';
-    if (!token) {
-        console.warn(
-            '[testbed] No ADO token found. Set one via:\n' +
-            "  localStorage.setItem('testbed:adoToken', 'your-real-token')\n" +
-            'Real backend calls will fail without a valid token.'
-        );
-    }
-    return token;
+    return FAKE_ADO_TOKEN;
 }
 
 export function getExtensionContext() {

@@ -5,14 +5,16 @@ export async function submitReview(
     backendUrl: string,
     clientKey: string,
     adoToken: string,
+    orgUrl: string,
     request: ReviewRequest,
 ): Promise<ReviewJob> {
     const base = backendUrl.replace(/\/$/, '');
     const response = await axios.post<ReviewJob>(`${base}/reviews`, request, {
         headers: {
-            'X-Client-Key': clientKey,
-            'X-Ado-Token':  adoToken,
-            'Content-Type': 'application/json',
+            'X-Client-Key':   clientKey,
+            'X-Ado-Token':    adoToken,
+            'X-Ado-Org-Url':  orgUrl,
+            'Content-Type':   'application/json',
         },
     });
     return response.data;
@@ -21,11 +23,13 @@ export async function submitReview(
 export async function getReviewStatus(
     backendUrl: string,
     clientKey: string,
+    adoToken: string,
+    orgUrl: string,
     jobId: string,
 ): Promise<ReviewStatusResponse> {
     const base = backendUrl.replace(/\/$/, '');
     const response = await axios.get<ReviewStatusResponse>(`${base}/reviews/${jobId}`, {
-        headers: { 'X-Client-Key': clientKey },
+        headers: { 'X-Client-Key': clientKey, 'X-Ado-Token': adoToken, 'X-Ado-Org-Url': orgUrl },
     });
     return response.data;
 }
@@ -33,10 +37,12 @@ export async function getReviewStatus(
 export async function listReviews(
     backendUrl: string,
     clientKey: string,
+    adoToken: string,
+    orgUrl: string,
 ): Promise<ReviewListItem[]> {
     const base = backendUrl.replace(/\/$/, '');
     const response = await axios.get<ReviewListItem[]>(`${base}/reviews`, {
-        headers: { 'X-Client-Key': clientKey },
+        headers: { 'X-Client-Key': clientKey, 'X-Ado-Token': adoToken, 'X-Ado-Org-Url': orgUrl },
     });
     return response.data;
 }
