@@ -3,7 +3,7 @@
     "id": "meister-propr",
     "name": "Meister ProPR",
     "description": "AI-powered code review for Azure DevOps pull requests, powered by Microsoft Foundry agents",
-    "publisher": "meister-propr-test-extension",
+    "publisher": "saenatwork",
     "targets": [
         { "id": "Microsoft.VisualStudio.Services" }
     ],

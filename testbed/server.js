@@ -62,10 +62,8 @@ app.get('/', (_req, res) => {
     <ul>
       <li>Settings are persisted in <code>localStorage</code> — changes survive page refreshes.</li>
       <li>
-        To make real backend calls from the Review hub, paste a valid ADO personal access token
-        in the browser console before visiting the page:
-        <br>
-        <code>localStorage.setItem('testbed:adoToken', 'your-ado-pat-here')</code>
+        A random fake ADO token is generated each time the page loads and sent automatically
+        with all backend requests. Check the browser console for the token value.
       </li>
       <li>
         Edit <code>testbed/mocks/azure-devops-extension-api.ts</code> to change the mock
