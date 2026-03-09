@@ -17,7 +17,7 @@ The backend is maintained in a **separate repository**. This repository contains
 **Build commands:**
 - `npm run build` — production webpack build
 - `npm run build:dev` — development webpack build
-- `npm run generate:api` — generate typed TS client from `../backend/openapi.json`
+- `npm run generate:api` — generate typed TS client from `../meister-propr/openapi.json`
 - `npm run package` — package as `.vsix` via tfx-cli
 
 **TypeScript check:** `npx tsc --noEmit`
