@@ -37,12 +37,3 @@ export async function saveSettings(settings: ExtensionSettings): Promise<void> {
     ]);
 }
 
-export async function loadProjectCrawlReviewerName(projectId: string): Promise<string> {
-    const dm = await getDataManager();
-    return dm.getValue<string>(`crawlReviewerDisplayName_${projectId}`, { scopeType: 'Default', defaultValue: '' });
-}
-
-export async function saveProjectCrawlReviewerName(projectId: string, name: string): Promise<void> {
-    const dm = await getDataManager();
-    await dm.setValue(`crawlReviewerDisplayName_${projectId}`, name, { scopeType: 'Default' });
-}

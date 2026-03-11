@@ -27,15 +27,14 @@
         <hr class="section-divider">
         <h3>Crawl Configuration</h3>
         <p class="section-description">
-            Set a reviewer display name to enable automatic pull request crawling for this project.
-            Leave blank to disable crawling.
+            Enable automatic pull request crawling for this project.
+            The reviewer identity is configured by your administrator at the client level.
         </p>
 
-        <div class="form-group">
-            <label for="reviewer-display-name">Reviewer Display Name</label>
-            <input type="text" id="reviewer-display-name"
-                   placeholder="e.g. John Smith or service-principal-name">
-            <div id="reviewer-hint" class="input-hint"></div>
+        <div class="form-group form-group--checkbox">
+            <input type="checkbox" id="crawl-enabled">
+            <label for="crawl-enabled">Enable automatic PR crawling for this project</label>
+            <div id="crawl-hint" class="input-hint"></div>
         </div>
 
         <button id="save-btn">Save Settings</button>
