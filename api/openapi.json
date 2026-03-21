@@ -551,7 +551,7 @@
         "tags": [
           "Clients"
         ],
-        "summary": "Enables or disables a client. Requires `X-Admin-Key`.",
+        "summary": "Updates one or more fields of a client (display name, active status). Requires `X-Admin-Key`.",
         "parameters": [
           {
             "name": "clientId",
@@ -565,7 +565,7 @@
           }
         ],
         "requestBody": {
-          "description": "Update request.",
+          "description": "Fields to update; omit a field to leave it unchanged.",
           "content": {
             "application/json": {
               "schema": {
@@ -1620,14 +1620,6 @@
           "hasAdoCredentials": {
             "type": "boolean"
           },
-          "adoTenantId": {
-            "type": "string",
-            "nullable": true
-          },
-          "adoClientId": {
-            "type": "string",
-            "nullable": true
-          },
           "reviewerId": {
             "type": "string",
             "format": "uuid",
@@ -1635,7 +1627,7 @@
           }
         },
         "additionalProperties": false,
-        "description": "Client response — key and ADO secret are never included."
+        "description": "Client response — key, ADO secret, and credential metadata are never included."
       },
       "CommentSeverity": {
         "enum": [
@@ -1825,11 +1817,16 @@
         "type": "object",
         "properties": {
           "isActive": {
-            "type": "boolean"
+            "type": "boolean",
+            "nullable": true
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false,
-        "description": "Request body for patching a client's active status."
+        "description": "Request body for patching a client. All fields are optional; omitted fields are left unchanged."
       },
       "PatchCrawlConfigRequest": {
         "type": "object",
