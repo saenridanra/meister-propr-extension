@@ -37,6 +37,24 @@
             <div id="crawl-hint" class="input-hint"></div>
         </div>
 
+        <hr class="section-divider">
+        <h3>Reviewer Identity</h3>
+        <p class="section-description">
+            Search for and select the Azure DevOps identity that will be used as the bot reviewer
+            for pull requests in this client. Type at least 2 characters to search.
+        </p>
+
+        <div class="form-group">
+            <label for="reviewer-search">Reviewer Identity</label>
+            <div class="autocomplete-wrapper">
+                <input type="text" id="reviewer-search" autocomplete="off" spellcheck="false"
+                    aria-autocomplete="list" aria-controls="reviewer-dropdown" aria-expanded="false"
+                    placeholder="Search by display name…">
+                <ul id="reviewer-dropdown" class="autocomplete-dropdown" role="listbox" hidden></ul>
+            </div>
+            <div id="reviewer-hint" class="input-hint"></div>
+        </div>
+
         <button id="save-btn">Save Settings</button>
         <div id="status-message"></div>
     </div>

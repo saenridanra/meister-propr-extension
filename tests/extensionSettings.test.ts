@@ -1,5 +1,10 @@
 import * as SDK from 'azure-devops-extension-sdk';
-import { loadSettings, saveSettings, loadProjectCrawlReviewerName, saveProjectCrawlReviewerName } from '../src/common/extensionSettings';
+import {
+    loadSettings,
+    saveSettings,
+    loadReviewerDisplayName,
+    saveReviewerDisplayName,
+} from '../src/common/extensionSettings';
 
 jest.mock('azure-devops-extension-sdk');
 
@@ -39,26 +44,24 @@ describe('extensionSettings', () => {
         expect(mockDataManager.setValue).toHaveBeenCalledWith('clientId', 'new-client-id', expect.anything());
     });
 
-    test('loadProjectCrawlReviewerName returns stored name', async () => {
-        mockDataManager.getValue.mockResolvedValue('John Doe');
-        const name = await loadProjectCrawlReviewerName('proj-123');
-        expect(mockDataManager.getValue).toHaveBeenCalledWith('crawlReviewerDisplayName_proj-123', expect.anything());
-        expect(name).toBe('John Doe');
-    });
-
-    test('loadProjectCrawlReviewerName returns empty string when missing', async () => {
+    test('loadReviewerDisplayName returns empty string when key absent', async () => {
         mockDataManager.getValue.mockResolvedValue('');
-        const name = await loadProjectCrawlReviewerName('proj-456');
+        const name = await loadReviewerDisplayName();
         expect(name).toBe('');
     });
 
-    test('saveProjectCrawlReviewerName persists name', async () => {
-        await saveProjectCrawlReviewerName('proj-123', 'Jane Smith');
-        expect(mockDataManager.setValue).toHaveBeenCalledWith('crawlReviewerDisplayName_proj-123', 'Jane Smith', expect.anything());
+    test('loadReviewerDisplayName returns stored name', async () => {
+        mockDataManager.getValue.mockResolvedValue('Meister Bot');
+        const name = await loadReviewerDisplayName();
+        expect(name).toBe('Meister Bot');
     });
 
-    test('saveProjectCrawlReviewerName with empty string clears value', async () => {
-        await saveProjectCrawlReviewerName('proj-123', '');
-        expect(mockDataManager.setValue).toHaveBeenCalledWith('crawlReviewerDisplayName_proj-123', '', expect.anything());
+    test('saveReviewerDisplayName calls setValue with correct key and value', async () => {
+        await saveReviewerDisplayName('Meister Bot');
+        expect(mockDataManager.setValue).toHaveBeenCalledWith(
+            'reviewerDisplayName',
+            'Meister Bot',
+            { scopeType: 'Default' }
+        );
     });
 });

@@ -1,9 +1,7 @@
 import { OpenAPI } from '../generated/core/OpenAPI';
 import { ClientsService } from '../generated/services/ClientsService';
-import { IdentitiesService } from '../generated/services/IdentitiesService';
 import type { CrawlConfigResponse } from '../generated/models/CrawlConfigResponse';
 import type { CreateCrawlConfigRequest } from '../generated/models/CreateCrawlConfigRequest';
-import type { IdentityResponse } from '../generated/models/IdentityResponse';
 
 export const DEFAULT_CRAWL_INTERVAL_SECONDS = 300;
 
@@ -41,9 +39,3 @@ export async function deleteCrawlConfig(
     }
 }
 
-export async function resolveIdentity(
-    backendUrl: string, clientKey: string, orgUrl: string, displayName: string
-): Promise<IdentityResponse[]> {
-    setup(backendUrl, clientKey);
-    return IdentitiesService.getIdentitiesResolve(orgUrl, displayName);
-}

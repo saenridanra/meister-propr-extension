@@ -1,6 +1,6 @@
 {
   "name": "meister-propr-extension",
-  "version": "1.0.5",
+  "version": "1.0.10",
   "description": "Azure DevOps extension for AI-powered code review of pull requests using Microsoft Foundry agents",
   "private": true,
   "scripts": {
@@ -21,10 +21,12 @@
     "azure-devops-extension-sdk": "^4.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.2",
     "css-loader": "^7.1.2",
     "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.3.0",
     "openapi-typescript-codegen": "^0.29.0",
     "style-loader": "^4.0.0",
     "tfx-cli": "^0.17.0",

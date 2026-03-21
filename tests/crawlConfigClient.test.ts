@@ -1,4 +1,4 @@
-import { ClientsService } from '../src/generated/services/ClientsService';
+import { ClientsService } from '../src/generated';
 import { listCrawlConfigs, createCrawlConfig, deleteCrawlConfig } from '../src/api/crawlConfigClient';
 
 jest.mock('../src/generated/services/ClientsService');
@@ -41,4 +41,5 @@ describe('crawlConfigClient', () => {
         (ClientsService.deleteClientsCrawlConfigurations as jest.Mock).mockRejectedValue({ status: 404 });
         await expect(deleteCrawlConfig(backendUrl, clientKey, clientId, 'config-1')).resolves.not.toThrow();
     });
+
 });

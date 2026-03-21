@@ -86,6 +86,28 @@ interface ReviewRequest {
 
 const jobs = new Map<string, Job>();
 
+// Reviewer identity storage: clientId → reviewerId
+const reviewerIds = new Map<string, string>();
+
+// Crawl config storage: clientId → list of configs
+interface CrawlConfig {
+    id: string;
+    organizationUrl: string;
+    projectId: string;
+    crawlIntervalSeconds: number;
+    createdAt: string;
+}
+const crawlConfigs = new Map<string, CrawlConfig[]>();
+
+// Fixed identity pool for search stubs
+const IDENTITY_POOL = [
+    {id: 'aaaaaaaa-0001-0001-0001-000000000001', displayName: 'Meister Bot'},
+    {id: 'aaaaaaaa-0002-0002-0002-000000000002', displayName: 'Review Bot'},
+    {id: 'aaaaaaaa-0003-0003-0003-000000000003', displayName: 'Bot Service Account'},
+    {id: 'aaaaaaaa-0004-0004-0004-000000000004', displayName: 'CI Review Agent'},
+    {id: 'aaaaaaaa-0005-0005-0005-000000000005', displayName: 'Testbed Reviewer'},
+];
+
 const MOCK_SUCCESS_RESULT: ReviewResult = {
     summary:
         'Overall this PR is well-structured and the intent is clear. There are a few issues ' +
@@ -213,7 +235,7 @@ function isOriginAllowed(origin: string): boolean {
 function setCorsHeaders(res: ServerResponse, origin: string, isPreflight: boolean): void {
     const allowed = isOriginAllowed(origin) ? origin : 'http://localhost:3000';
     res.setHeader('Access-Control-Allow-Origin', allowed);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Client-Key, X-Ado-Token');
     res.setHeader('Vary', 'Origin');
     if (isPreflight) {
@@ -263,6 +285,7 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
     }
 
     const url = new URL(req.url!, `http://localhost:${PORT}`);
+    console.log(`[backend] ${req.method} ${url.pathname}`);
 
     // POST /reviews — submit a new review job
     if (req.method === 'POST' && url.pathname === '/reviews') {
@@ -303,6 +326,94 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise
         }
         console.log(`[backend] Poll: ${jobId} → ${job.status}`);
         send(res, 200, jobToStatusResponse(job));
+        return;
+    }
+
+    // GET /clients/:clientId/crawl-configurations
+    const crawlListMatch = url.pathname.match(/^\/clients\/([^/]+)\/crawl-configurations$/);
+    if (req.method === 'GET' && crawlListMatch) {
+        if (!checkAuth(req, res)) return;
+        const clientId = crawlListMatch[1]!;
+        send(res, 200, crawlConfigs.get(clientId) ?? []);
+        return;
+    }
+
+    // POST /clients/:clientId/crawl-configurations
+    if (req.method === 'POST' && crawlListMatch) {
+        if (!checkAuth(req, res)) return;
+        const clientId = crawlListMatch[1]!;
+        const body = await readBody(req);
+        const config: CrawlConfig = {
+            id: randomUUID(),
+            organizationUrl: String(body['organizationUrl'] ?? ''),
+            projectId: String(body['projectId'] ?? ''),
+            crawlIntervalSeconds: Number(body['crawlIntervalSeconds'] ?? 300),
+            createdAt: new Date().toISOString(),
+        };
+        const existing = crawlConfigs.get(clientId) ?? [];
+        crawlConfigs.set(clientId, [...existing, config]);
+        console.log(`[backend] Crawl config created for client ${clientId}: ${config.id}`);
+        send(res, 201, config);
+        return;
+    }
+
+    // DELETE /clients/:clientId/crawl-configurations/:configId
+    const crawlDeleteMatch = url.pathname.match(/^\/clients\/([^/]+)\/crawl-configurations\/([^/]+)$/);
+    if (req.method === 'DELETE' && crawlDeleteMatch) {
+        if (!checkAuth(req, res)) return;
+        const clientId = crawlDeleteMatch[1]!;
+        const configId = crawlDeleteMatch[2]!;
+        const existing = crawlConfigs.get(clientId) ?? [];
+        crawlConfigs.set(clientId, existing.filter(c => c.id !== configId));
+        console.log(`[backend] Crawl config deleted for client ${clientId}: ${configId}`);
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    // GET /identities/resolve?orgUrl=...&displayName=... — search identity pool
+    if (req.method === 'GET' && url.pathname === '/identities/resolve') {
+        if (!checkAuth(req, res)) return;
+        const query = (url.searchParams.get('displayName') ?? '').toLowerCase();
+        if (!query) {
+            send(res, 404, {error: 'displayName query parameter is required'});
+            return;
+        }
+        const matches = IDENTITY_POOL.filter(i => i.displayName.toLowerCase().includes(query));
+        send(res, 200, matches); // empty array is valid — let the UI show "No results found"
+        return;
+    }
+
+    // GET /clients/:clientId/profile — return stored profile
+    const profileMatch = url.pathname.match(/^\/clients\/([^/]+)\/profile$/);
+    if (req.method === 'GET' && profileMatch) {
+        if (!checkAuth(req, res)) return;
+        const clientId = profileMatch[1]!;
+        send(res, 200, {
+            id: clientId,
+            displayName: 'Testbed Client',
+            isActive: true,
+            createdAt: '2026-01-01T00:00:00Z',
+            reviewerId: reviewerIds.get(clientId) ?? null,
+        });
+        return;
+    }
+
+    // PUT /clients/:clientId/reviewer-identity — store reviewerId
+    const reviewerMatch = url.pathname.match(/^\/clients\/([^/]+)\/reviewer-identity$/);
+    if (req.method === 'PUT' && reviewerMatch) {
+        if (!checkAuth(req, res)) return;
+        const clientId = reviewerMatch[1]!;
+        const body = await readBody(req);
+        const reviewerId = body['reviewerId'];
+        if (typeof reviewerId !== 'string' || reviewerId.trim() === '') {
+            send(res, 400, {error: 'reviewerId must be a non-empty string'});
+            return;
+        }
+        reviewerIds.set(clientId, reviewerId.trim());
+        console.log(`[backend] Reviewer identity set for client ${clientId}: ${reviewerId}`);
+        res.writeHead(204);
+        res.end();
         return;
     }
 

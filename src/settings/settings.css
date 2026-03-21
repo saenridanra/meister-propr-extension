@@ -121,3 +121,49 @@ button:disabled {
 .form-group--checkbox #crawl-hint {
     width: 100%;
 }
+
+/* Autocomplete dropdown */
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    z-index: 100;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    list-style: none;
+    margin: 2px 0 0 0;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.autocomplete-item {
+    padding: 7px 10px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item--focused {
+    background-color: #deecf9;
+    color: #0078d4;
+}
+
+.autocomplete-item--no-results {
+    font-style: italic;
+    color: #605e5c;
+    cursor: default;
+}
+
+.autocomplete-item--no-results:hover,
+.autocomplete-item--no-results.autocomplete-item--focused {
+    background-color: transparent;
+    color: #605e5c;
+}

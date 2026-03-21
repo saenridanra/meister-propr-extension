@@ -8,9 +8,10 @@ export interface ExtensionSettings {
 }
 
 const KEYS = {
-    backendUrl: 'backendUrl',
-    clientKey:  'clientKey',
-    clientId:   'clientId',
+    backendUrl:          'backendUrl',
+    clientKey:           'clientKey',
+    clientId:            'clientId',
+    reviewerDisplayName: 'reviewerDisplayName',
 } as const;
 
 async function getDataManager() {
@@ -26,6 +27,16 @@ export async function loadSettings(): Promise<Partial<ExtensionSettings>> {
         dm.getValue<string>(KEYS.clientId,   { scopeType: 'Default', defaultValue: '' }),
     ]);
     return { backendUrl, clientKey, clientId };
+}
+
+export async function loadReviewerDisplayName(): Promise<string> {
+    const dm = await getDataManager();
+    return dm.getValue<string>(KEYS.reviewerDisplayName, { scopeType: 'Default', defaultValue: '' });
+}
+
+export async function saveReviewerDisplayName(name: string): Promise<void> {
+    const dm = await getDataManager();
+    await dm.setValue(KEYS.reviewerDisplayName, name, { scopeType: 'Default' });
 }
 
 export async function saveSettings(settings: ExtensionSettings): Promise<void> {

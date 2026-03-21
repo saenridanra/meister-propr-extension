@@ -25,6 +25,21 @@ const mockExtensionDataService = {
     getExtensionDataManager: async (_id: string, _token: string) => mockDataManager,
 };
 
+const IDENTITY_POOL = [
+    { entityId: 'aaaaaaaa-0001-0001-0001-000000000001', displayName: 'Meister Bot' },
+    { entityId: 'aaaaaaaa-0002-0002-0002-000000000002', displayName: 'Review Bot' },
+    { entityId: 'aaaaaaaa-0003-0003-0003-000000000003', displayName: 'Bot Service Account' },
+    { entityId: 'aaaaaaaa-0004-0004-0004-000000000004', displayName: 'CI Review Agent' },
+    { entityId: 'aaaaaaaa-0005-0005-0005-000000000005', displayName: 'Testbed Reviewer' },
+];
+
+const mockIdentityService = {
+    searchIdentitiesAsync: async (query: string) => {
+        const q = query.toLowerCase();
+        return IDENTITY_POOL.filter(i => i.displayName.toLowerCase().includes(q));
+    },
+};
+
 export async function init(_options?: { loaded?: boolean }): Promise<void> {
     // no-op: in ADO this would handshake with the host frame
 }
@@ -67,6 +82,9 @@ export function getExtensionContext() {
     return { id: 'meister-propr', publisherId: 'meister-propr-test-extension', version: '0.0.1' };
 }
 
-export async function getService<T>(_serviceId: string): Promise<T> {
+export async function getService<T>(serviceId: string): Promise<T> {
+    if (serviceId === 'ms.vss-features.identity-service') {
+        return mockIdentityService as unknown as T;
+    }
     return mockExtensionDataService as unknown as T;
 }

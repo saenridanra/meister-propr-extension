@@ -25,7 +25,8 @@ module.exports = {
             // Exact-match aliases ($ suffix) so subpaths like /Git are matched separately
             'azure-devops-extension-sdk$':       path.resolve(__dirname, 'testbed/mocks/azure-devops-extension-sdk.ts'),
             'azure-devops-extension-api$':       path.resolve(__dirname, 'testbed/mocks/azure-devops-extension-api.ts'),
-            'azure-devops-extension-api/Git$':   path.resolve(__dirname, 'testbed/mocks/azure-devops-extension-api-git.ts'),
+            'azure-devops-extension-api/Git$':        path.resolve(__dirname, 'testbed/mocks/azure-devops-extension-api-git.ts'),
+            'azure-devops-extension-api/Identities$': path.resolve(__dirname, 'testbed/mocks/azure-devops-extension-api-identities.ts'),
         },
     },
     module: {
