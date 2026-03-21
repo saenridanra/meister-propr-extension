@@ -2,7 +2,7 @@ import * as SDK from 'azure-devops-extension-sdk';
 import { IdentityServiceIds, IVssIdentityService } from 'azure-devops-extension-api/Identities';
 import { loadSettings, saveSettings, loadReviewerDisplayName, saveReviewerDisplayName, ExtensionSettings } from '../common/extensionSettings';
 import { listCrawlConfigs, createCrawlConfig, deleteCrawlConfig, DEFAULT_CRAWL_INTERVAL_SECONDS } from '../api/crawlConfigClient';
-import { setReviewerIdentity } from '../api/reviewerIdentityClient';
+import { setReviewerIdentity, resolveIdentity } from '../api/reviewerIdentityClient';
 import './settings.css';
 
 // T016: module-level reviewer identity state
@@ -10,19 +10,6 @@ let selectedReviewerId: string | null = null;
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let focusIndex = -1;
 
-/**
- * Normalises an ADO identity entityId to a plain GUID.
- * Service principals return a VSS descriptor like
- * "vss.ds.v1.aad.servicePrincipal.0b7cdaa9b0d848cfa2886c7d4613bc36".
- * The trailing 32-char hex segment is the GUID without dashes.
- */
-function entityIdToGuid(entityId: string): string {
-    const hex = entityId.split('.').pop() ?? entityId;
-    if (/^[0-9a-f]{32}$/i.test(hex)) {
-        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-    }
-    return entityId; // already a plain GUID
-}
 
 function el<T extends HTMLElement>(id: string): T {
     const element = document.getElementById(id);
@@ -53,6 +40,28 @@ async function main(): Promise<void> {
     backendUrlInput.value = settings.backendUrl ?? '';
     clientKeyInput.value  = settings.clientKey  ?? '';
     clientIdInput.value   = settings.clientId   ?? '';
+
+    // Helper: resolve display name to VSS GUID via backend, store in selectedReviewerId
+    async function resolveAndSetId(displayName: string): Promise<void> {
+        selectedReviewerId = null;
+        reviewerHint.textContent = 'Resolving identity…';
+        reviewerHint.className = 'input-hint';
+        try {
+            const id = await resolveIdentity(
+                backendUrlInput.value.trim(), clientKeyInput.value.trim(), orgUrl, displayName);
+            if (id) {
+                selectedReviewerId = id;
+                reviewerHint.textContent = '';
+                reviewerHint.className = 'input-hint';
+            } else {
+                reviewerHint.textContent = 'Identity not found.';
+                reviewerHint.className = 'input-hint status-error';
+            }
+        } catch {
+            reviewerHint.textContent = 'Could not resolve identity.';
+            reviewerHint.className = 'input-hint status-error';
+        }
+    }
 
     // T017: dropdown open/close helpers
     function openDropdown(): void {
@@ -118,7 +127,7 @@ async function main(): Promise<void> {
                         const li = document.createElement('li');
                         li.className = 'autocomplete-item';
                         li.setAttribute('role', 'option');
-                        li.dataset['id'] = entityIdToGuid(identity.entityId);
+                        li.dataset['id'] = 'selectable';
                         li.textContent = (identity as any).displayName ?? identity.entityId;
                         reviewerDropdown.appendChild(li);
                     }
@@ -163,10 +172,11 @@ async function main(): Promise<void> {
         } else if (e.key === 'Enter') {
             e.preventDefault();
             const focused = items[focusIndex];
-            if (focused && focused.dataset['id']) {
-                selectedReviewerId = focused.dataset['id'];
-                reviewerSearchInput.value = focused.textContent ?? '';
+            if (focused) {
+                const displayName = focused.textContent ?? '';
+                reviewerSearchInput.value = displayName;
                 closeDropdown();
+                void resolveAndSetId(displayName);
             }
         } else if (e.key === 'Escape') {
             closeDropdown();
@@ -177,10 +187,11 @@ async function main(): Promise<void> {
     reviewerDropdown.addEventListener('click', (e) => {
         const target = e.target as HTMLElement;
         const item = target.closest('li[data-id]') as HTMLLIElement | null;
-        if (!item || !item.dataset['id']) return;
-        selectedReviewerId = item.dataset['id'];
-        reviewerSearchInput.value = item.textContent ?? '';
+        if (!item) return;
+        const displayName = item.textContent ?? '';
+        reviewerSearchInput.value = displayName;
         closeDropdown();
+        void resolveAndSetId(displayName);
     });
 
     // T020: pre-populate reviewer display name

@@ -14,7 +14,7 @@ jest.mock('azure-devops-extension-sdk');
 
 const { listCrawlConfigs, createCrawlConfig, deleteCrawlConfig } =
     crawlConfigClientMod as jest.Mocked<typeof crawlConfigClientMod>;
-const { setReviewerIdentity } =
+const { setReviewerIdentity, resolveIdentity } =
     reviewerIdentityClientMod as jest.Mocked<typeof reviewerIdentityClientMod>;
 const { loadSettings, saveSettings, loadReviewerDisplayName, saveReviewerDisplayName } =
     extensionSettingsMod as jest.Mocked<typeof extensionSettingsMod>;
@@ -42,6 +42,7 @@ function setupDefaultMocks(storedDisplayName = '') {
     deleteCrawlConfig.mockResolvedValue(undefined);
     mockSearchIdentities.mockResolvedValue([]);
     setReviewerIdentity.mockResolvedValue(undefined);
+    (resolveIdentity as jest.Mock).mockResolvedValue('resolved-guid');
     loadSettings.mockResolvedValue({ backendUrl: 'http://api.test', clientKey: 'test-key', clientId: 'client-123' });
     saveSettings.mockResolvedValue(undefined);
     loadReviewerDisplayName.mockResolvedValue(storedDisplayName);
@@ -97,10 +98,11 @@ describe('settings — reviewer identity section', () => {
         expect(mockSearchIdentities).not.toHaveBeenCalled();
     });
 
-    test('(b) setReviewerIdentity is called with selected entityId on save', async () => {
+    test('(b) setReviewerIdentity is called with resolved VSS GUID on save', async () => {
         setupDOM();
         setupDefaultMocks();
         mockSearchIdentities.mockResolvedValue([{ entityId: 'guid-abc', displayName: 'Meister Bot' }]);
+        (resolveIdentity as jest.Mock).mockResolvedValue('vss-guid-xyz');
 
         await initSettings();
 
@@ -116,12 +118,18 @@ describe('settings — reviewer identity section', () => {
         expect(item).not.toBeNull();
         item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
+        // Wait for resolveAndSetId to complete
+        await new Promise(r => setTimeout(r, 50));
+
         // Click save
         document.getElementById('save-btn')!.click();
         await new Promise(r => setTimeout(r, 50));
 
+        expect(resolveIdentity).toHaveBeenCalledWith(
+            'http://api.test', 'test-key', expect.stringContaining('dev.azure.com'), 'Meister Bot'
+        );
         expect(setReviewerIdentity).toHaveBeenCalledWith(
-            'http://api.test', 'test-key', 'client-123', 'guid-abc'
+            'http://api.test', 'test-key', 'client-123', 'vss-guid-xyz'
         );
     });
 
@@ -139,6 +147,9 @@ describe('settings — reviewer identity section', () => {
 
         const item = document.querySelector('#reviewer-dropdown li[data-id]') as HTMLLIElement;
         item.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+        // Wait for resolveAndSetId to complete
+        await new Promise(r => setTimeout(r, 50));
 
         document.getElementById('save-btn')!.click();
         await new Promise(r => setTimeout(r, 50));
