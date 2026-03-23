@@ -4,7 +4,6 @@ Thumbs.db
 *.env
 *.env.local
 .idea
-.claude
 .vscode
 
 # Node.js / Extension
@@ -21,7 +20,12 @@ testbed/node_modules/
 testbed/localhost-cert.pem
 testbed/localhost-key.pem
 
-# AI directories
-.github
+# AI / tooling directories
 .claude
 .gemini
+.specify
+.github/*
+!.github/workflows
+
+# Local test specs
+specs/
