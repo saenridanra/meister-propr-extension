@@ -3,7 +3,8 @@ import { getClient } from 'azure-devops-extension-api';
 import { GitRestClient, GitPullRequestSearchCriteria, PullRequestStatus } from 'azure-devops-extension-api/Git';
 import { loadSettings } from '../common/extensionSettings';
 import { submitReview, getReviewStatus, listReviews } from '../api/reviewClient';
-import type { ReviewComment, ReviewListItem, ReviewRequest } from '../api/models';
+import type { ReviewComment, ReviewRequest } from '../api/models';
+import { renderJobsGroups, formatTime } from './reviewGroups';
 import './review.css';
 
 function el<T extends HTMLElement>(id: string): T {
@@ -39,60 +40,6 @@ function renderCommentRow(comment: ReviewComment): HTMLTableRowElement {
     return tr;
 }
 
-function formatTime(iso: string | null): string {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleTimeString();
-}
-
-function renderJobsTable(
-    tbody: HTMLTableSectionElement,
-    jobs: ReviewListItem[],
-    repoNameMap: Map<string, string>,
-): void {
-    tbody.innerHTML = '';
-    if (!jobs.length) {
-        const tr = document.createElement('tr');
-        const td = document.createElement('td');
-        td.colSpan = 6;
-        td.textContent = 'No reviews submitted yet.';
-        td.style.textAlign = 'center';
-        td.style.color = '#666';
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        return;
-    }
-    for (const job of jobs) {
-        const tr = document.createElement('tr');
-
-        const prTd = document.createElement('td');
-        prTd.textContent = `#${job.pullRequestId}`;
-
-        const repoTd = document.createElement('td');
-        repoTd.textContent = repoNameMap.get(job.repositoryId) ?? job.repositoryId;
-
-        const statusTd = document.createElement('td');
-        statusTd.textContent = job.status;
-        statusTd.setAttribute('data-status', job.status);
-
-        const submittedTd = document.createElement('td');
-        submittedTd.textContent = formatTime(job.submittedAt);
-
-        const completedTd = document.createElement('td');
-        completedTd.textContent = formatTime(job.completedAt);
-
-        const actionsTd = document.createElement('td');
-        if (job.status === 'completed' || job.status === 'failed') {
-            const btn = document.createElement('button');
-            btn.className = 'btn-link';
-            btn.setAttribute('data-job-id', job.jobId);
-            btn.textContent = job.status === 'completed' ? 'View results' : 'View error';
-            actionsTd.appendChild(btn);
-        }
-
-        tr.append(prTd, repoTd, statusTd, submittedTd, completedTd, actionsTd);
-        tbody.appendChild(tr);
-    }
-}
 
 const JOBS_REFRESH_MS = 5_000;
 
@@ -117,7 +64,8 @@ async function main(): Promise<void> {
     const resultsBody    = el<HTMLTableSectionElement>('results-body');
     const errorDiv       = el<HTMLDivElement>('error-message');
     const jobsSection    = el<HTMLDivElement>('jobs-section');
-    const jobsBody       = el<HTMLTableSectionElement>('jobs-body');
+    const jobsGroups     = el<HTMLDivElement>('jobs-groups');
+    const prFilter       = el<HTMLInputElement>('pr-filter');
 
     const settings = await loadSettings();
     const { backendUrl, clientKey } = settings;
@@ -159,6 +107,9 @@ async function main(): Promise<void> {
     } catch {
         // Repo list is informational; continue without it
     }
+
+    const expandedGroups = new Set<string>();
+    let lastJobList: import('../api/models').ReviewListItem[] = [];
 
     let selectedPrId: number | null = null;
     let prCache: PrItem[] | null    = null;
@@ -317,17 +268,23 @@ async function main(): Promise<void> {
         prSearch.placeholder = hasRepo ? 'Type to search pull requests…' : 'Select a repository first';
     });
 
+    function rerender(): void {
+        renderJobsGroups(jobsGroups, lastJobList, repoNameMap, expandedGroups, prFilter.value);
+    }
+
     async function doRefreshJobs(): Promise<void> {
         try {
-            const jobList = await listReviews(backendUrl!, clientKey!, adoToken, orgUrl);
-            renderJobsTable(jobsBody, jobList, repoNameMap);
+            lastJobList = await listReviews(backendUrl!, clientKey!, adoToken, orgUrl);
         } catch {
             // Non-critical — backend may be temporarily unreachable
         }
+        rerender();
     }
 
+    prFilter.addEventListener('input', rerender);
+
     // View job details via event delegation (buttons are re-created on each refresh)
-    jobsBody.addEventListener('click', (e) => {
+    jobsGroups.addEventListener('click', (e) => {
         const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-job-id]');
         if (btn) onViewJobDetails(btn.getAttribute('data-job-id')!);
     });

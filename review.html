@@ -62,19 +62,10 @@
 
         <div id="jobs-section" style="display:none">
             <h3>Recent Reviews</h3>
-            <table id="jobs-table">
-                <thead>
-                    <tr>
-                        <th>PR</th>
-                        <th>Repository</th>
-                        <th>Status</th>
-                        <th>Submitted</th>
-                        <th>Completed</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="jobs-body"></tbody>
-            </table>
+            <div class="jobs-filter-bar">
+                <input type="text" id="pr-filter" placeholder="Filter by PR number…" autocomplete="off">
+            </div>
+            <div id="jobs-groups"></div>
         </div>
     </div>
 

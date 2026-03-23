@@ -211,7 +211,7 @@ button:disabled {
     color: #0078d4;
 }
 
-/* Jobs overview table */
+/* Jobs overview — grouped by PR */
 
 #jobs-section {
     margin-top: 32px;
@@ -219,49 +219,122 @@ button:disabled {
     padding-top: 8px;
 }
 
-#jobs-table {
+.jobs-filter-bar {
+    margin-top: 10px;
+}
+
+.jobs-filter-bar input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 13px;
+    border: 1px solid #c8c6c4;
+    border-radius: 2px;
+    color: #323130;
+}
+
+.jobs-filter-bar input:focus {
+    outline: none;
+    border-color: #0078d4;
+}
+
+.jobs-empty {
+    text-align: center;
+    color: #666;
+    padding: 16px 0;
+}
+
+.pr-group-toggle {
+    display: block;
+    width: 100%;
+    padding: 5px 10px;
+    font-size: 12px;
+    color: #0078d4;
+    text-align: left;
+    background: none;
+    border: none;
+    border-top: 1px solid #edebe9;
+    cursor: pointer;
+}
+
+.pr-group-toggle:hover {
+    background: #f3f2f1;
+}
+
+.pr-group {
+    margin-top: 16px;
+    border: 1px solid #edebe9;
+    border-radius: 2px;
+}
+
+.pr-group-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #f3f2f1;
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 1px solid #edebe9;
+}
+
+.pr-group-link {
+    color: #0078d4;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.pr-group-link:hover {
+    text-decoration: underline;
+}
+
+.pr-group-repo {
+    color: #666;
+    font-weight: 400;
+}
+
+.pr-group-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 8px;
     font-size: 13px;
 }
 
-#jobs-table th,
-#jobs-table td {
+.pr-group-table th,
+.pr-group-table td {
     border: 1px solid #ddd;
     padding: 8px 10px;
     text-align: left;
     vertical-align: middle;
 }
 
-#jobs-table th {
-    background: #f3f2f1;
+.pr-group-table th {
+    background: #faf9f8;
     font-weight: 600;
 }
 
-#jobs-table tbody tr:nth-child(even) {
+.pr-group-table tbody tr:nth-child(even) {
     background: #faf9f8;
 }
 
-#jobs-table tbody tr:hover {
+.pr-group-table tbody tr:hover {
     background: #edebe9;
 }
 
-#jobs-table td[data-status="pending"] {
+.pr-group-table td[data-status="pending"] {
     color: #666;
 }
 
-#jobs-table td[data-status="processing"] {
+.pr-group-table td[data-status="processing"] {
     color: #0078d4;
     font-weight: 600;
 }
 
-#jobs-table td[data-status="completed"] {
+.pr-group-table td[data-status="completed"] {
     color: #107c10;
     font-weight: 600;
 }
 
-#jobs-table td[data-status="failed"] {
+.pr-group-table td[data-status="failed"] {
     color: #a80000;
     font-weight: 600;
 }

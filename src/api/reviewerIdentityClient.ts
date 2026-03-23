@@ -1,4 +1,4 @@
-import { ClientProfileResponse, ClientsService, IdentitiesService, OpenAPI } from '../generated';
+import { ClientResponse, ClientsService, IdentitiesService, OpenAPI } from '../generated';
 
 function setup(backendUrl: string, clientKey: string) {
     OpenAPI.BASE = backendUrl.replace(/\/$/, '');
@@ -9,9 +9,9 @@ function setup(backendUrl: string, clientKey: string) {
 
 export async function getClientProfile(
     backendUrl: string, clientKey: string, clientId: string
-): Promise<ClientProfileResponse> {
+): Promise<ClientResponse> {
     setup(backendUrl, clientKey);
-    return ClientsService.getClientsProfile(clientId);
+    return ClientsService.getClients1(clientId);
 }
 
 export async function setReviewerIdentity(

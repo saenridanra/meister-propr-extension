@@ -12,7 +12,7 @@ describe('reviewerIdentityClient', () => {
         jest.clearAllMocks();
     });
 
-    test('getClientProfile calls generated getClientsProfile and returns the result', async () => {
+    test('getClientProfile calls generated getClients1 and returns the result', async () => {
         const mockProfile = {
             id: clientId,
             displayName: 'Test Client',
@@ -20,11 +20,11 @@ describe('reviewerIdentityClient', () => {
             createdAt: '2026-01-01T00:00:00Z',
             reviewerId: 'guid-456',
         };
-        (ClientsService.getClientsProfile as jest.Mock).mockResolvedValue(mockProfile);
+        (ClientsService.getClients1 as jest.Mock).mockResolvedValue(mockProfile);
 
         const result = await getClientProfile(backendUrl, clientKey, clientId);
 
-        expect(ClientsService.getClientsProfile).toHaveBeenCalledWith(clientId);
+        expect(ClientsService.getClients1).toHaveBeenCalledWith(clientId);
         expect(result).toEqual(mockProfile);
     });
 
